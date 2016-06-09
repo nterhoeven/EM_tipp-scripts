@@ -9,20 +9,20 @@ my%ranking;
 my@results;
 my%simulations;
 
-open(FIFA,'<','fifa_ranking_cropped.txt') or die $!;
+open(FIFA,'<','fifa_ranking.txt') or die $!;
 <FIFA>;
 while(<FIFA>)
 {
     chomp;
     my@line=split(/\t/,$_);
     $line[1]=~s/\s/_/g;
-    $ranking{$line[1]}={'rank' => $line[0], 'points' => $line[2]};
+    $ranking{$line[0]}=$line[1];
 }
 close FIFA or die $!;
 
 #print Dumper \%ranking;
 
-open(RES,'<','results.list') or die $!;
+open(RES,'<','results.list.sorted') or die $!;
 while(<RES>)
 {
     chomp;
@@ -66,9 +66,10 @@ if(!exists($ranking{$guest}))
 }
 
 
-my$sum=$ranking{$home}{'points'}+$ranking{$guest}{'points'};
-my$chance_home=$ranking{$home}{'points'}/$sum;
+my$sum=$ranking{$home}+$ranking{$guest};
+my$chance_home=$ranking{$home}/$sum;
 
+#print "sum: ",$sum,"\nchance: ",$chance_home,"\n";
 
 for(my$i=0;$i<100;$i++)
 {
@@ -82,7 +83,6 @@ for(my$i=0;$i<100;$i++)
     {
 	$winner=$guest;
     }
-
     $simulations{$winner.'_'.$result}++;
 
 }
@@ -96,8 +96,18 @@ for(my$i=0;$i<100;$i++)
 #}
 
 my@keys = sort {$simulations{$b}<=>$simulations{$a}} keys %simulations;  
+my($won,$res)=$keys[0]=~/(\w+)_(.*)/;
 
-print $keys[0],"\tcount: ",$simulations{$keys[0]},"\n",$keys[1],"\tcount: ",$simulations{$keys[1]},"\n",$keys[2],"\tcount: ",$simulations{$keys[2]},"\n";
+if($won eq $home)
+{
+    my$real=reverse $res;
+    print $home," ",$real," ",$guest,"\n";
+}
+else
+{
+    print $home," ",$res," ",$guest,"\n";
+}
+#print $keys[0],"\tcount: ",$simulations{$keys[0]},"\n",$keys[1],"\tcount: ",$simulations{$keys[1]},"\n",$keys[2],"\tcount: ",$simulations{$keys[2]},"\n";
 
 
 

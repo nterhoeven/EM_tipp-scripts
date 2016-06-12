@@ -10,7 +10,6 @@ my@results;
 my%simulations;
 
 open(FIFA,'<','fifa_ranking.txt') or die $!;
-<FIFA>;
 while(<FIFA>)
 {
     chomp;
